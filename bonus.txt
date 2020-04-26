@@ -1,0 +1,43 @@
+Team rabena_Yostor
+
+We have implemented our own  B+/R Tree without using any libraries, we have saved(serialized)each node separately on disk.
+We have a method called writeObject in the DBApp class that when given an object and a path, saves this object in this path on disk and
+a method called readObject that when give a path loads the object that is saved there.
+In the methods createRTreeIndex and createBTreeIndex, we first create the tree and save it in its specific directory inside the table of which the
+tree is associated with, the tree is initially created with no nodes ,we then load this tree and loop on all the records in the table and insert them in the tree by calling
+the insert method  in the class Tree.
+The Tree class has the root's path and the number of nodes created as attributes and they are loaded when the tree is loaded.
+The root path of the tree is initially null and when we insert our first inserion in the tree the root path is set with the path of the root node created and we 
+only load the root when we need to and this goes for the other nodes as well (we have their paths and load them when it is essential).
+We have two types of Node (InternalNode and LeafNode) both have their path and their parent's path as attributes.
+Everytime we create a node ,we check the number of nodes the tree has and set the path of the node to be a node with the number of nodes incremented.
+for eg. if we have 3 nodes already, the number of nodes in the tree will be 3 and so when we create a new node we give it a number of 4 and the number of nodes in 
+the tree is incremented to 4 ,the new node then has the name  "4.ser" on disk.Whenever we insert into table using the insertIntoTable method in class DBApp,
+we check if there is an index on the clustering key,and if there is we then load the tree which only has the root path saved in it and then we find the 
+page we should insert the record in using the tree and update the indices accordingly.
+We have a method called searchForLeaf in class Tree that takes the key and path of root initially and returns the LeafNode that contains this key,
+it traverses accross the tree and each time we reach a node path we load it by the method readObject in DBApp class 
+and so this prevents us from loading all the nodes and only loading the ones that will lead us to the LeafNode that contains the key.
+When we delete from table using the deleteFromTable method in DBApp class, we do the same thing, if there is an index created, we load the tree and find the
+leaf that contains the key by using the searchForLeaf method in the Tree class , this will lead us to the leafpages(which contain all the page paths the key
+is in since there are duplicates,they are in the form of linked lists with each leafPage containing a number of page paths corresponding to the MaximumNodeSize as required)
+and we will delete the path of the page that contains the record from the leafpages if this page doesnt contain another duplicate of the key.
+The same thing occurs in updateTable method in DBApp, we load the tree if there is an index and find the path of the page that contains the old record and
+delete it if it doesnt have any duplicates of that key and insert the new record's page path , this also occurs by searching for the appropriate leaf using
+the searchForLeaf method so that we only load the needed nodes.
+In the selectFromTable method we also search for the pages that contain the records in the same efficient way of not loading all the nodes at once
+and only load the ones we need from the disk.
+
+Overall,The Tree,BPTree,RTree,Node,InternalNode,LeafNode and LeafPage classes have their obects serialized and saved separately on disk to only load the objetcs we 
+need using the readObject method in DBApp mentioned above.
+
+
+
+
+
+
+
+
+
+
+
