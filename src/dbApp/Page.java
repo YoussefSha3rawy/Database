@@ -1,4 +1,4 @@
-package rabena_yostor;
+package dbApp;
 
 import java.io.Serializable;
 
